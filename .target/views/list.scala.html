@@ -1,0 +1,70 @@
+@(employeeList: List[Employee])(implicit flash: play.api.mvc.Flash)
+
+@**********************************
+* Helper generating table headers *
+***********************************@
+@header(title: String) = {
+    <th>@title</th>
+}
+
+@main("Play with Anorm") {
+
+	<!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1>
+        	@Messages("employee.list.title", employeeList.size) 
+        	<a class="btn btn-primary pull-right" id="add" href="@routes.Application.create()">Add a new employee</a>
+        </h1>
+      </div>
+      
+      @flash.get("success").map { message =>
+	      <div class="alert-message warning">
+	          <strong>Done!</strong> @message
+	      </div>
+	  }
+    
+    @Option(employeeList).filterNot(_.isEmpty).map { employees =>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    @header("Name")
+                    @header("Address")
+                    @header("Date of Birth")
+                    @header("Joining Date")
+                    @header("Designation")
+                </tr>
+            </thead>
+            <tbody>
+
+                @employees.map { employee =>
+                    <tr>
+                        <td><a href="@routes.Application.edit(employee.id.get)">@employee.name</a></td>
+                        <td>@employee.address</td>
+                        <td>
+                            @employee.dob.format("dd MMM yyyy")
+                        </td>
+                        <td>
+                            @employee.joiningDate.format("dd MMM yyyy")
+                        </td>
+                        <td>
+                            @employee.designation
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        
+    }.getOrElse {
+        
+        <div class="well">
+            <em>Nothing to display</em>
+        </div>
+        
+    }
+    </div>
+}
+
+            
