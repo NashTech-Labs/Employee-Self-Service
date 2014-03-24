@@ -1,5 +1,6 @@
-Employee-Self-Service : Building Reactive Play application with Anorm SQL data access
-=====================================================================================
+[Employee-Self-Service](http://play-with-anorm.herokuapp.com/)
+==================================================================
+Building Reactive Play application with Anorm SQL data access
 
 This is a classic CRUD application, backed by a JDBC database. It demonstrates:
 - Accessing a JDBC database, using Anorm.  
