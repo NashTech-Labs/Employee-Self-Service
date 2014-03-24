@@ -17,6 +17,8 @@ project/target
 target
 .target
 .cache
+.bin
+bin
 tmp
 .history
 dist

@@ -4,14 +4,16 @@
 
 set ignorecase true;
 
-create table employee (
-  id                        bigint not null AUTO_INCREMENT,
-  name                      varchar(255) not null,
-  address                   varchar(1000) not null,
-  dob		                timestamp,
-  joining_date              timestamp,
-  designation               varchar(255) not null,
-  constraint pk_employee primary key (id))
+CREATE TABLE employee (
+  id                        BIGINT NOT NULL AUTO_INCREMENT,
+  name                      VARCHAR(255) NOT NULL,
+  address                   VARCHAR(1000) NOT NULL,
+  dob		                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  joining_date              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  designation               VARCHAR(255) NOT NULL,
+  create_date				TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_date				TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT pk_employee PRIMARY KEY (id))
 ;
 
 # --- !Downs
