@@ -1,0 +1,1 @@
+ web target/universal/stage/bin/employee-database -Dhttp.port=$PORT -DapplyEvolutions.default=true
