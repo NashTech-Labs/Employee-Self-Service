@@ -11,8 +11,6 @@ CREATE TABLE employee (
   dob		                TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   joining_date              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   designation               VARCHAR(255) NOT NULL,
-  create_date				TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  update_date				TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT pk_employee PRIMARY KEY (id))
 ;
 
