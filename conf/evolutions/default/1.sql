@@ -5,7 +5,7 @@
 set ignorecase true;
 
 create table employee (
-  id                        bigint not null,
+  id                        bigint not null AUTO_INCREMENT,
   name                      varchar(255) not null,
   address                   varchar(1000) not null,
   dob		                timestamp,
