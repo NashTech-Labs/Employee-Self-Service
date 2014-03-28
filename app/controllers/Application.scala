@@ -4,12 +4,12 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-
 import anorm._
-
 import views._
 import models._
-
+import play.api.libs.concurrent.Promise
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.duration._
 
 object Application extends Controller {
   
@@ -30,17 +30,17 @@ object Application extends Controller {
   /**
    * Handle default path requests, redirect to employee list
    */
-  def index = Action { Home }
+  def index = Action.async { Promise.timeout(Home, 1 seconds) }
 
   /**
    * This result directly redirect to the application home.
    */
   val Home = Redirect(routes.Application.list())
 
-  def list() = Action { implicit request =>
+  def list() = Action.async { implicit request =>
     Employee.list match {
-      case Right(data) => Ok(html.list(data))
-      case Left(error) => Ok(html.list(Nil))
+      case Right(data) => Promise.timeout(Ok(html.list(data)), 1 seconds)
+      case Left(error) => Promise.timeout(Ok(html.list(Nil)), 1 seconds)
     }
   }
   
@@ -49,10 +49,10 @@ object Application extends Controller {
    *
    * @param id Id of the employee to edit
    */
-  def edit(id: Long) = Action {
+  def edit(id: Long) = Action.async {
     Employee.findById(id).map { employee =>
-      Ok(html.editForm(id, employeeForm.fill(employee)))
-    }.getOrElse(NotFound)
+      Promise.timeout(Ok(html.editForm(id, employeeForm.fill(employee))), 1 seconds)
+    }.getOrElse(Promise.timeout(NotFound, 1 seconds))
   }
   
   /**
@@ -60,12 +60,12 @@ object Application extends Controller {
    *
    * @param id Id of the employee to edit
    */
-  def update(id: Long) = Action { implicit request =>
+  def update(id: Long) = Action.async { implicit request =>
     employeeForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.editForm(id, formWithErrors)),
+      formWithErrors => {Promise.timeout(BadRequest(html.editForm(id, formWithErrors)), 1 seconds)},
       employee => {
         Employee.update(id, employee)
-        Home.flashing("success" -> "Employee %s has been updated".format(employee.name))
+        Promise.timeout(Home.flashing("success" -> "Employee %s has been updated".format(employee.name)), 1 seconds)
       }
     )
   }
@@ -73,19 +73,19 @@ object Application extends Controller {
   /**
    * Display the 'new employee form'.
    */
-  def create = Action {
-    Ok(html.createForm(employeeForm))
+  def create = Action.async {
+    Promise.timeout(Ok(html.createForm(employeeForm)), 1 seconds)
   }
   
   /**
    * Handle the 'new employee form' submission.
    */
-  def save = Action { implicit request =>
+  def save = Action.async { implicit request =>
     employeeForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(html.createForm(formWithErrors)),
+      formWithErrors => Promise.timeout(BadRequest(html.createForm(formWithErrors)), 1 seconds),
       employee => {
         Employee.insert(employee)
-        Home.flashing("success" -> "Employee %s has been created".format(employee.name))
+        Promise.timeout(Home.flashing("success" -> "Employee %s has been created".format(employee.name)), 1 seconds)
       }
     )
   }
@@ -93,9 +93,9 @@ object Application extends Controller {
   /**
    * Handle computer deletion.
    */
-  def delete(id: Long) = Action {
+  def delete(id: Long) = Action.async {
     Employee.delete(id)
-    Home.flashing("success" -> "Computer has been deleted")
+    Promise.timeout(Home.flashing("success" -> "Computer has been deleted"), 1 seconds)
   }
 
 }
