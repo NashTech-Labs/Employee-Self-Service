@@ -8,10 +8,12 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         
         <!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("bootswatch/yeti/bootstrap.min.css")">
+		<!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
 		
 		<!-- Optional theme -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+		<!-- <link rel="stylesheet" media="screen" href="@routes.Assets.at("bootstrap-3.1.1/css/bootstrap-theme.min.css")"> -->
+		<!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"> -->
         
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
         
@@ -25,19 +27,7 @@
     <body>
     
     	<!-- Fixed navbar -->
-	    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-	      <div class="container">
-	        <div class="navbar-header">
-	          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-	            <span class="sr-only">Toggle navigation</span>
-	            <span class="icon-bar"></span>
-	            <span class="icon-bar"></span>
-	            <span class="icon-bar"></span>
-	          </button>
-	          <a class="navbar-brand" href="@routes.Application.index()">Employee-Self-Service -- Play application with Anorm SQL data access</a>
-	        </div>
-	      </div>
-	    </div>
+	    @navbar()
 	    
         @content
 
