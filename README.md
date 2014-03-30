@@ -3,13 +3,16 @@
 Building Reactive Play application with Anorm SQL data access
 
 This is a classic CRUD application, backed by a JDBC database. It demonstrates:
-- Accessing a JDBC database, using Anorm.  
+- Handling asynchronous results, Handling time-outs
+- Accessing a JDBC database, using Anorm.
+- Play and Scala-based template engine implementation
 - Integrating with a CSS framework (Twitter Bootstrap 3.1.1).  Twitter Bootstrap requires a different form layout to the default one that the Play form helper generates, so this application also provides an example of integrating a custom form input constructor.
+- Bootswatch-Yeti with Twitter Bootstrap 3.1.1 to improve the look and feel of the application
 
 -----------------------------------------------------------------------
 ###Instructions :-
 -----------------------------------------------------------------------
-* The live application is currently hosted at : http://play-with-anorm.herokuapp.com/
+* The live application is currently hosted at : http://employee-self-service.herokuapp.com/
 * The Github code for the project is at : https://github.com/knoldus/Employee-Self-Service
 * Clone the project into local system
 * Install play  if you do not have it already. You can get it from here: http://www.playframework.com/download
@@ -22,3 +25,4 @@ This is a classic CRUD application, backed by a JDBC database. It demonstrates:
 -----------------------------------------------------------------------
 * Play Framework :- http://www.playframework.com/documentation/2.2.1/ScalaAnorm
 * Bootstrap 3.1.1 :- http://getbootstrap.com/css/
+* Bootswatch :- http://bootswatch.com/yeti/
