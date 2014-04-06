@@ -1,4 +1,4 @@
-name := "employee-database"
+name := "employee-self-service"
 
 version := "1.0-SNAPSHOT"
 

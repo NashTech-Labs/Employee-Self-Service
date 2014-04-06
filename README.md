@@ -1,4 +1,4 @@
-[Employee-Self-Service](http://play-with-anorm.herokuapp.com/)
+[Employee-Self-Service](http://employee-self-service.herokuapp.com/)
 ==================================================================
 Building Reactive Play application with Anorm SQL data access
 

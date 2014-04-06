@@ -44,12 +44,12 @@ object Employee {
    *
    * @return
    */
-  def list(): Either[String, List[Employee]] = {
+  def list(): List[Employee] = {
     DB.withConnection { implicit connection =>
       try {
-        Right(SQL("select * from employee order by name").as(employee *))
+        SQL("select * from employee order by name").as(employee *)
       } catch {
-        case ex: Exception => Logger.info("ERROR", ex); Left(ex.getMessage())
+        case ex: Exception => Logger.info("ERROR", ex); Nil
       }
     }
   }

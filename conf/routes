@@ -2,9 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
-
 # Default path will just redirect to the employee list
 GET     /                           controllers.Application.index
 
@@ -13,7 +10,7 @@ GET     /employees                  controllers.Application.list
 
 # Add employee
 GET     /employees/new              controllers.Application.create
-POST    /employees                  controllers.Application.save
+POST    /employees/save             controllers.Application.save
 
 # Edit existing employee
 GET     /employees/:id              controllers.Application.edit(id:Long)
