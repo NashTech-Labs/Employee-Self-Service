@@ -9,11 +9,14 @@ import play.api._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.concurrent.Promise
 import play.api.mvc._
 import views._
+import java.util.concurrent.TimeoutException
+import play.api.libs.concurrent.Promise
 
 object Application extends Controller {
+
+  implicit val timeout = 10.seconds
 
   /**
    * Describe the employee form (used in both edit and create screens).
@@ -38,13 +41,11 @@ object Application extends Controller {
   val Home = Redirect(routes.Application.list())
 
   def list() = Action.async { implicit request =>
-    val futureEmpList: Future[List[Employee]] = scala.concurrent.Future { Employee.list }
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 10.second)
-    Future.firstCompletedOf(Seq(futureEmpList, timeoutFuture)).map {
-      case data: List[Employee] => Ok(html.list(data))
-      case t: String =>
+    val futureEmpList: Future[List[Employee]] = TimeoutFuture(Employee.list())
+    futureEmpList.map(employees => Ok(html.list(employees))).recover {
+      case t: TimeoutException =>
         Logger.error("Problem found in employee list process")
-        InternalServerError(t)
+        InternalServerError(t.getMessage)
     }
   }
 
@@ -54,16 +55,14 @@ object Application extends Controller {
    * @param id Id of the employee to edit
    */
   def edit(id: Long) = Action.async {
-    val futureEmp: Future[Option[models.Employee]] = scala.concurrent.Future { Employee.findById(id) }
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 10.second)
-    Future.firstCompletedOf(Seq(futureEmp, timeoutFuture)).map {
-      case employee: Option[Employee] =>
-        employee.map { emp =>
-          Ok(html.editForm(id, employeeForm.fill(emp)))
-        }.getOrElse(NotFound)
-      case t: String =>
+    val futureEmp: Future[Option[models.Employee]] = TimeoutFuture(Employee.findById(id))
+    futureEmp.map {
+      case Some(employee) => Ok(html.editForm(id, employeeForm.fill(employee)))
+      case None => NotFound
+    }.recover {
+      case t: TimeoutException =>
         Logger.error("Problem found in employee edit process")
-        InternalServerError(t)
+        InternalServerError(t.getMessage)
     }
   }
 
@@ -74,15 +73,15 @@ object Application extends Controller {
    */
   def update(id: Long) = Action.async { implicit request =>
     employeeForm.bindFromRequest.fold(
-      formWithErrors => { Promise.timeout(BadRequest(html.editForm(id, formWithErrors)), 10 seconds) },
+      formWithErrors => Future.successful(BadRequest(html.editForm(id, formWithErrors))),
       employee => {
-        val futureUpdateEmp: Future[Int] = scala.concurrent.Future { Employee.update(id, employee) }
-        val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 10.second)
-        Future.firstCompletedOf(Seq(futureUpdateEmp, timeoutFuture)).map {
-          case empId: Int => Home.flashing("success" -> "Employee %s has been updated".format(employee.name))
-          case t: String =>
+        val futureUpdateEmp: Future[Int] = TimeoutFuture(Employee.update(id, employee))
+        futureUpdateEmp.map { empId =>
+          Home.flashing("success" -> s"Employee ${employee.name} has been updated")
+        }.recover {
+          case t: TimeoutException =>
             Logger.error("Problem found in employee update process")
-            InternalServerError(t)
+            InternalServerError(t.getMessage)
         }
       })
   }
@@ -99,38 +98,53 @@ object Application extends Controller {
    */
   def save = Action.async { implicit request =>
     employeeForm.bindFromRequest.fold(
-      formWithErrors => Promise.timeout(BadRequest(html.createForm(formWithErrors)), 10.seconds),
+      formWithErrors => Future.successful(BadRequest(html.createForm(formWithErrors))),
       employee => {
-        val futureUpdateEmp: Future[Option[Long]] = scala.concurrent.Future { Employee.insert(employee) }
-        val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 10.second)
-        Future.firstCompletedOf(Seq(futureUpdateEmp, timeoutFuture)).map {
-          case empId: Option[Long] => empId match {
-            case Some(id) =>
-              val msg = "Employee %s has been created".format(employee.name)
-              Logger.info(msg)
-              Home.flashing("success" -> msg)
-            case None =>
-              val msg = "Employee %s has not created".format(employee.name)
-              Logger.info(msg)
-              Home.flashing("success" -> msg)
-          }
-          case t: String =>
+        val futureUpdateEmp: Future[Option[Long]] = TimeoutFuture(Employee.insert(employee))
+        futureUpdateEmp.map {
+          case Some(empId) =>
+            val msg = s"Employee ${employee.name} has been created"
+            Logger.info(msg)
+            Home.flashing("success" -> msg)
+          case None =>
+            val msg = s"Employee ${employee.name} has not created"
+            Logger.info(msg)
+            Home.flashing("error" -> msg)
+        }.recover {
+          case t: TimeoutException =>
             Logger.error("Problem found in employee update process")
-            InternalServerError(t)
+            InternalServerError(t.getMessage)
         }
       })
   }
 
   /**
-   * Handle computer deletion.
+   * Handle employee deletion.
    */
   def delete(id: Long) = Action.async {
-    val futureInt = scala.concurrent.Future { Employee.delete(id) }
-    val timeoutFuture = play.api.libs.concurrent.Promise.timeout("Oops", 1.second)
-    Future.firstCompletedOf(Seq(futureInt, timeoutFuture)).map {
-      case i: Int => Home.flashing("success" -> "Computer has been deleted")
-      case t: String => InternalServerError(t)
+    val futureInt = TimeoutFuture(Employee.delete(id))
+    futureInt.map(i => Home.flashing("success" -> "Employee has been deleted")).recover {
+      case t: TimeoutException =>
+        Logger.error("Problem deleting employee")
+        InternalServerError(t.getMessage)
     }
+  }
+
+  object TimeoutFuture {
+
+    def apply[A](block: => A)(implicit timeout: FiniteDuration): Future[A] = {
+
+      val promise = scala.concurrent.promise[A]()
+
+      // if the promise doesn't have a value yet then this completes the future with a failure
+      Promise.timeout(Nil, timeout).map(_ => promise.tryFailure(new TimeoutException("This operation timed out")))
+
+      // this tries to complete the future with the value from block
+      Future(promise.success(block))
+
+      promise.future
+    }
+
   }
 
 }
