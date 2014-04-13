@@ -10,6 +10,14 @@ import play.api.Logger
 
 case class Employee(id: Pk[Long] = NotAssigned, name: String, address: String, dob: Date, joiningDate: Date, designation: String)
 
+/**
+ * Helper for pagination.
+ */
+case class Page[A](items: Seq[A], page: Int, offset: Long, total: Long) {
+  lazy val prev = Option(page - 1).filter(_ >= 0)
+  lazy val next = Option(page + 1).filter(_ => (offset + items.size) < total)
+}
+
 object Employee {
 
   // -- Parsers
@@ -38,13 +46,56 @@ object Employee {
       SQL("select * from employee where id = {id}").on('id -> id).as(employee.singleOpt)
     }
   }
+  
+  /**
+   * Return a page of (Employee).
+   *
+   * @param page Page to display
+   * @param pageSize Number of employees per page
+   * @param orderBy Employee property used for sorting
+   * @param filter Filter applied on the name column
+   */
+  def list(page: Int = 0, pageSize: Int = 10, orderBy: Int = 1, filter: String = "%"): Page[Employee] = {
+    
+    val offest = pageSize * page
+    
+    DB.withConnection { implicit connection =>
+      
+      val employees = SQL(
+        """
+          select * from employee 
+          where employee.name like {filter}
+          order by {orderBy} nulls last
+          limit {pageSize} offset {offset}
+        """
+      ).on(
+        'pageSize -> pageSize, 
+        'offset -> offest,
+        'filter -> filter,
+        'orderBy -> orderBy
+      ).as(employee *)
+
+      val totalRows = SQL(
+        """
+          select count(*) from employee 
+          where employee.name like {filter}
+        """
+      ).on(
+        'filter -> filter
+      ).as(scalar[Long].single)
+
+      Page(employees, page, offest, totalRows)
+      
+    }
+    
+  }
 
   /**
    * Retrieve all employee.
    *
    * @return
    */
-  def list(): List[Employee] = {
+  def findAll(): List[Employee] = {
     DB.withConnection { implicit connection =>
       try {
         SQL("select * from employee order by name").as(employee *)

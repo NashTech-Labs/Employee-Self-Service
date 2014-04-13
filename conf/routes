@@ -5,8 +5,8 @@
 # Default path will just redirect to the employee list
 GET     /                           controllers.Application.index
 
-# Employees list
-GET     /employees                  controllers.Application.list
+# Employees list (look at the default values for pagination parameters)
+GET     /employees                  controllers.Application.list(p:Int ?= 0, s:Int ?= 2, f ?= "")
 
 # Add employee
 GET     /employees/new              controllers.Application.create

@@ -40,9 +40,16 @@ object Application extends Controller {
    */
   val Home = Redirect(routes.Application.list())
 
-  def list() = Action.async { implicit request =>
-    val futureEmpList: Future[List[Employee]] = TimeoutFuture(Employee.list())
-    futureEmpList.map(employees => Ok(html.list(employees))).recover {
+  /**
+   * Display the paginated list of employees.
+   *
+   * @param page Current page number (starts from 0)
+   * @param orderBy Column to be sorted
+   * @param filter Filter applied on employee names
+   */
+  def list(page: Int, orderBy: Int, filter: String) = Action.async { implicit request =>
+    val futurePage: Future[Page[Employee]] = TimeoutFuture(Employee.list(page = page, orderBy = orderBy, filter = ("%" + filter + "%")))
+    futurePage.map(page => Ok(html.list(page, orderBy, filter))).recover {
       case t: TimeoutException =>
         Logger.error("Problem found in employee list process")
         InternalServerError(t.getMessage)
