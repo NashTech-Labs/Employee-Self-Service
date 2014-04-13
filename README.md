@@ -26,7 +26,7 @@ This is a classic CRUD application, backed by a JDBC database. It demonstrates:
 -----------------------------------------------------------------------
 ###References :-
 -----------------------------------------------------------------------
-* Play Framework :- http://www.playframework.com/documentation/2.2.1/ScalaAnorm
+* Play Framework :- http://www.playframework.com/documentation/2.2.2/ScalaAnorm
 * Bootstrap 3.1.1 :- http://getbootstrap.com/css/
 * Bootswatch :- http://bootswatch.com/yeti/
 * WebJars :- http://www.webjars.org/
