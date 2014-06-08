@@ -59,7 +59,7 @@
 		
 					@employees.map { employee =>
 					<tr>
-						<td><a href="@routes.Application.edit(employee.id.get)">@employee.name</a></td>
+						<td><a href="@routes.Application.edit(employee.id)">@employee.name</a></td>
 						<td>@employee.address</td>
 						<td>@employee.dob.format("dd MMM yyyy")</td>
 						<td>@employee.joiningDate.format("dd MMM yyyy")</td>

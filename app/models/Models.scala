@@ -8,7 +8,7 @@ import anorm.SqlParser._
 import scala.language.postfixOps
 import play.api.Logger
 
-case class Employee(id: Pk[Long] = NotAssigned, name: String, address: String, dob: Date, joiningDate: Date, designation: String)
+case class Employee(id: Long, name: String, address: String, dob: Date, joiningDate: Date, designation: String)
 
 /**
  * Helper for pagination.
@@ -26,7 +26,7 @@ object Employee {
    * Parse a Employee from a ResultSet
    */
   val employee = {
-    get[Pk[Long]]("employee.id") ~
+    get[Long]("employee.id") ~
       get[String]("employee.name") ~
       get[String]("employee.address") ~
       get[Date]("employee.dob") ~
@@ -141,7 +141,7 @@ object Employee {
     		{id}, {name}, {address}, {dob}, {joiningDate}, {designation}
           )
         """).on(
-          'id -> employee.id,
+          'id -> None,
           'name -> employee.name,
           'address -> employee.address,
           'dob -> employee.dob,

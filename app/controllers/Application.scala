@@ -23,7 +23,7 @@ object Application extends Controller {
    */
   val employeeForm = Form(
     mapping(
-      "id" -> ignored(NotAssigned: Pk[Long]),
+      "id" -> ignored(0: Long),
       "name" -> nonEmptyText,
       "address" -> nonEmptyText,
       "dob" -> date("yyyy-MM-dd"),
