@@ -1,6 +1,6 @@
 [Employee-Self-Service](http://employee-self-service.herokuapp.com/)
 ==================================================================
-[![Coverage Status](https://coveralls.io/repos/knoldus/Employee-Self-Service/badge.svg)](https://coveralls.io/r/knoldus/Employee-Self-Service) Building Reactive Play application with Anorm SQL data access
+Building Reactive Play application with Anorm SQL data access
 
 This is a classic CRUD application, backed by a JDBC database. It demonstrates:
 - Handling asynchronous results, Handling time-outs
